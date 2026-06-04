@@ -18,17 +18,14 @@ describe('Lamport Logical Clock Entity', () => {
   it('update(receivedTime) should correctly calculate the new time', () => {
     const clock = new Clock('C');
     
-    // Simula eventos locais
     clock.tick(); 
     clock.tick(); 
     expect(clock.time).toBe(2);
 
-    // Recebe uma mensagem com tempo maior
     clock.update(5);
-    expect(clock.time).toBe(6); // max(2, 5) + 1 = 6
+    expect(clock.time).toBe(6);
 
-    // Recebe uma mensagem com tempo menor
     clock.update(3);
-    expect(clock.time).toBe(7); // max(6, 3) + 1 = 7
+    expect(clock.time).toBe(7);
   });
 });
