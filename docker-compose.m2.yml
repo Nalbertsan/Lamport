@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  machine2-proc4:
+    image: nalbertsan/lamport-backend:latest
+    container_name: lamport-m2-p4
+    environment:
+      - NODE_ID=P4
+      - MACHINE_ID=2
+      - HTTP_PORT=3004
+      - TCP_PORT=5004
+      - PEERS=P1:${M1_IP:-127.0.0.1}:5001,P2:${M1_IP:-127.0.0.1}:5002,P3:${M1_IP:-127.0.0.1}:5003,P5:lamport-m2-p5:5005,P6:lamport-m2-p6:5006
+    ports:
+      - "4004:3004"
+      - "5004:5004"
+    networks:
+      - lamport-net
+
+  machine2-proc5:
+    image: nalbertsan/lamport-backend:latest
+    container_name: lamport-m2-p5
+    environment:
+      - NODE_ID=P5
+      - MACHINE_ID=2
+      - HTTP_PORT=3005
+      - TCP_PORT=5005
+      - PEERS=P1:${M1_IP:-127.0.0.1}:5001,P2:${M1_IP:-127.0.0.1}:5002,P3:${M1_IP:-127.0.0.1}:5003,P4:lamport-m2-p4:5004,P6:lamport-m2-p6:5006
+    ports:
+      - "4005:3005"
+      - "5005:5005"
+    networks:
+      - lamport-net
+
+  machine2-proc6:
+    image: nalbertsan/lamport-backend:latest
+    container_name: lamport-m2-p6
+    environment:
+      - NODE_ID=P6
+      - MACHINE_ID=2
+      - HTTP_PORT=3006
+      - TCP_PORT=5006
+      - PEERS=P1:${M1_IP:-127.0.0.1}:5001,P2:${M1_IP:-127.0.0.1}:5002,P3:${M1_IP:-127.0.0.1}:5003,P4:lamport-m2-p4:5004,P5:lamport-m2-p5:5005
+    ports:
+      - "4006:3006"
+      - "5006:5006"
+    networks:
+      - lamport-net
+
+networks:
+  lamport-net:
+    driver: bridge

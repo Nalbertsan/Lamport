@@ -1,0 +1,118 @@
+
+services:
+  # ── Máquina 1 ── Processo P1 ────────────────────────────────────
+  machine1-proc1:
+    build: ./backend
+    container_name: lamport-m1-p1
+    environment:
+      - NODE_ID=P1
+      - MACHINE_ID=1
+      - HTTP_PORT=3001
+      - TCP_PORT=5001
+      - PEERS=P2:lamport-m1-p2:5002,P3:lamport-m1-p3:5003,P4:lamport-m2-p4:5004,P5:lamport-m2-p5:5005,P6:lamport-m2-p6:5006
+    ports:
+      - "3001:3001"
+    networks:
+      - lamport-net
+
+  # ── Máquina 1 ── Processo P2 ────────────────────────────────────
+  machine1-proc2:
+    build: ./backend
+    container_name: lamport-m1-p2
+    environment:
+      - NODE_ID=P2
+      - MACHINE_ID=1
+      - HTTP_PORT=3002
+      - TCP_PORT=5002
+      - PEERS=P1:lamport-m1-p1:5001,P3:lamport-m1-p3:5003,P4:lamport-m2-p4:5004,P5:lamport-m2-p5:5005,P6:lamport-m2-p6:5006
+    ports:
+      - "3002:3002"
+    networks:
+      - lamport-net
+
+  # ── Máquina 1 ── Processo P3 ────────────────────────────────────
+  machine1-proc3:
+    build: ./backend
+    container_name: lamport-m1-p3
+    environment:
+      - NODE_ID=P3
+      - MACHINE_ID=1
+      - HTTP_PORT=3003
+      - TCP_PORT=5003
+      - PEERS=P1:lamport-m1-p1:5001,P2:lamport-m1-p2:5002,P4:lamport-m2-p4:5004,P5:lamport-m2-p5:5005,P6:lamport-m2-p6:5006
+    ports:
+      - "3003:3003"
+    networks:
+      - lamport-net
+
+  # ── Máquina 2 ── Processo P4 ────────────────────────────────────
+  machine2-proc4:
+    build: ./backend
+    container_name: lamport-m2-p4
+    environment:
+      - NODE_ID=P4
+      - MACHINE_ID=2
+      - HTTP_PORT=3004
+      - TCP_PORT=5004
+      - PEERS=P1:lamport-m1-p1:5001,P2:lamport-m1-p2:5002,P3:lamport-m1-p3:5003,P5:lamport-m2-p5:5005,P6:lamport-m2-p6:5006
+    ports:
+      - "3004:3004"
+    networks:
+      - lamport-net
+
+  # ── Máquina 2 ── Processo P5 ────────────────────────────────────
+  machine2-proc5:
+    build: ./backend
+    container_name: lamport-m2-p5
+    environment:
+      - NODE_ID=P5
+      - MACHINE_ID=2
+      - HTTP_PORT=3005
+      - TCP_PORT=5005
+      - PEERS=P1:lamport-m1-p1:5001,P2:lamport-m1-p2:5002,P3:lamport-m1-p3:5003,P4:lamport-m2-p4:5004,P6:lamport-m2-p6:5006
+    ports:
+      - "3005:3005"
+    networks:
+      - lamport-net
+
+  # ── Máquina 2 ── Processo P6 ────────────────────────────────────
+  machine2-proc6:
+    build: ./backend
+    container_name: lamport-m2-p6
+    environment:
+      - NODE_ID=P6
+      - MACHINE_ID=2
+      - HTTP_PORT=3006
+      - TCP_PORT=5006
+      - PEERS=P1:lamport-m1-p1:5001,P2:lamport-m1-p2:5002,P3:lamport-m1-p3:5003,P4:lamport-m2-p4:5004,P5:lamport-m2-p5:5005
+    ports:
+      - "3006:3006"
+    networks:
+      - lamport-net
+
+  # ── Frontend ────────────────────────────────────────────────────
+  frontend:
+    build: ./frontend
+    container_name: lamport-frontend
+    environment:
+      - VITE_URL_P1=${VITE_URL_P1:-http://localhost:3001}
+      - VITE_URL_P2=${VITE_URL_P2:-http://localhost:3002}
+      - VITE_URL_P3=${VITE_URL_P3:-http://localhost:3003}
+      - VITE_URL_P4=${VITE_URL_P4:-http://localhost:3004}
+      - VITE_URL_P5=${VITE_URL_P5:-http://localhost:3005}
+      - VITE_URL_P6=${VITE_URL_P6:-http://localhost:3006}
+    ports:
+      - "3000:3000"
+    networks:
+      - lamport-net
+    depends_on:
+      - machine1-proc1
+      - machine1-proc2
+      - machine1-proc3
+      - machine2-proc4
+      - machine2-proc5
+      - machine2-proc6
+
+networks:
+  lamport-net:
+    driver: bridge

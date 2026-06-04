@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  machine1-proc1:
+    image: nalbertsan/lamport-backend:latest
+    container_name: lamport-m1-p1
+    environment:
+      - NODE_ID=P1
+      - MACHINE_ID=1
+      - HTTP_PORT=3001
+      - TCP_PORT=5001
+      - PEERS=P2:lamport-m1-p2:5002,P3:lamport-m1-p3:5003,P4:${M2_IP:-127.0.0.1}:5004,P5:${M2_IP:-127.0.0.1}:5005,P6:${M2_IP:-127.0.0.1}:5006
+    ports:
+      - "3001:3001"
+      - "5001:5001"
+    networks:
+      - lamport-net
+
+  machine1-proc2:
+    image: nalbertsan/lamport-backend:latest
+    container_name: lamport-m1-p2
+    environment:
+      - NODE_ID=P2
+      - MACHINE_ID=1
+      - HTTP_PORT=3002
+      - TCP_PORT=5002
+      - PEERS=P1:lamport-m1-p1:5001,P3:lamport-m1-p3:5003,P4:${M2_IP:-127.0.0.1}:5004,P5:${M2_IP:-127.0.0.1}:5005,P6:${M2_IP:-127.0.0.1}:5006
+    ports:
+      - "3002:3002"
+      - "5002:5002"
+    networks:
+      - lamport-net
+
+  machine1-proc3:
+    image: nalbertsan/lamport-backend:latest
+    container_name: lamport-m1-p3
+    environment:
+      - NODE_ID=P3
+      - MACHINE_ID=1
+      - HTTP_PORT=3003
+      - TCP_PORT=5003
+      - PEERS=P1:lamport-m1-p1:5001,P2:lamport-m1-p2:5002,P4:${M2_IP:-127.0.0.1}:5004,P5:${M2_IP:-127.0.0.1}:5005,P6:${M2_IP:-127.0.0.1}:5006
+    ports:
+      - "3003:3003"
+      - "5003:5003"
+    networks:
+      - lamport-net
+
+  frontend:
+    image: nalbertsan/lamport-frontend:latest
+    container_name: lamport-frontend
+    environment:
+      - VITE_URL_P1=http://${M1_IP:-localhost}:3001
+      - VITE_URL_P2=http://${M1_IP:-localhost}:3002
+      - VITE_URL_P3=http://${M1_IP:-localhost}:3003
+      - VITE_URL_P4=http://${M2_IP:-localhost}:4004
+      - VITE_URL_P5=http://${M2_IP:-localhost}:4005
+      - VITE_URL_P6=http://${M2_IP:-localhost}:4006
+    ports:
+      - "3000:3000"
+    networks:
+      - lamport-net
+
+networks:
+  lamport-net:
+    driver: bridge
